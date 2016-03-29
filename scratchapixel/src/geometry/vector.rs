@@ -1,12 +1,15 @@
-pub struct Vec3 {
-    x: f64,
-    y: f64,
-    z: f64,
+use std::ops::{Mul,Add};
+
+#[derive(Copy,Clone)]
+pub struct Vec3<T: Mul<T, Output = T> + Add<T, Output = T> + Copy + Clone> {
+    x: T,
+    y: T,
+    z: T,
 }
 
-impl Vec3 {
-    pub fn length(&self) -> f64 {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+impl <T: Mul<T, Output = T> + Add<T, Output = T> + Copy + Clone> Vec3<T> {
+    pub fn norm(self) -> T {
+        (self.x * self.x + self.y * self.y + self.z * self.z)
     }
 }
 
@@ -16,8 +19,8 @@ mod tests {
 
     #[test]
     fn should_know_its_length() {
-        let v: Vec3 = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
+        let v: Vec3<f64> = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
 
-        assert_eq!(v.length(), 0.0);
+        assert_eq!(v.norm(), 0.0);
     }
 }
