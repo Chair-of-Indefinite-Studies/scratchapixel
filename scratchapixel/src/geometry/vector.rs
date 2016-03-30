@@ -9,6 +9,10 @@ pub struct Vec3<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Zero + Cop
 }
 
 impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy + Clone {
+    pub fn new(xx: T, yy: T, zz: T) -> Vec3<T> {
+        Vec3 { x: xx, y: yy, z: zz }
+    }
+
     pub fn zero() -> Vec3<T> {
         Vec3 { x: T::zero(), y: T::zero(), z: T::zero() }
     }
@@ -25,6 +29,13 @@ impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy
 #[cfg(test)]
 mod tests {
     use super::Vec3;
+
+    #[test]
+    fn should_be_created_with_constructor() {
+        let v: Vec3<f64> = Vec3::new(0.0, 1.0, 2.0);
+
+        assert_eq!(v, Vec3 { x: 0.0, y: 1.0, z: 2.0 });
+    }
 
     #[test]
     fn should_initialize_to_zero_vector() {
