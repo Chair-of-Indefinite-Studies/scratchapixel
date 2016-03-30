@@ -17,7 +17,7 @@ mod tests {
     use super::Vec3;
 
     #[test]
-    fn should_know_its_length() {
+    fn should_know_its_norm() {
         let v: Vec3<f64> = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
 
         assert_eq!(v.norm(), 0.0);
