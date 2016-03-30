@@ -1,12 +1,12 @@
 use std::ops::{Mul,Add};
 
-pub struct Vec3<T: Mul<T, Output = T> + Add<T, Output = T> + Copy + Clone> {
+pub struct Vec3<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Copy + Clone {
     x: T,
     y: T,
     z: T,
 }
 
-impl <T: Mul<T, Output = T> + Add<T, Output = T> + Copy + Clone> Vec3<T> {
+impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Copy + Clone {
     pub fn norm(self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z)
     }
