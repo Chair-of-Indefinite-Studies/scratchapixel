@@ -34,6 +34,19 @@ impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Outp
     }
 }
 
+impl <T> Add<Vec3<T>> for Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Zero + Copy + Clone {
+    type Output = Vec3<T>;
+
+    fn add(self, rhs: Vec3<T>) -> Vec3<T> {
+        Vec3::new(
+            self.x + rhs.x,
+            self.y + rhs.y,
+            self.z + rhs.z,
+            )
+    }
+}
+
+
 impl <T> Vec3<T> where T: Mul<T, Output=T> + One + Zero + Float + Clone + Copy {
     pub fn length(& self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
@@ -109,5 +122,15 @@ mod tests {
         let product = v.cross(w);
 
         assert_eq!(product, Vec3 { x: 0.0, y: 0.0, z: 1.0 });
+    }
+
+    #[test]
+    fn should_form_vector_sum() {
+        let v: Vec3<f64> = Vec3::new(1.0, 0.0, 0.0);
+        let w: Vec3<f64> = Vec3::new(0.0, 1.0, 0.0);
+
+        let sum = v + w;
+
+        assert_eq!(sum, Vec3 { x: 1.0, y: 1.0, z: 0.0 });
     }
 }
