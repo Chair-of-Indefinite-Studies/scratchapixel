@@ -14,11 +14,11 @@ impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy
     }
 
     pub fn zero() -> Vec3<T> {
-        Vec3 { x: T::zero(), y: T::zero(), z: T::zero() }
+        Vec3::new(T::zero(), T::zero(), T::zero())
     }
 
     pub fn diagonal(xx: T) -> Vec3<T> {
-        Vec3 { x: xx, y: xx, z: xx }
+        Vec3::new(xx, xx, xx)
     }
 
     pub fn norm(self) -> T {
