@@ -20,13 +20,9 @@ impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy
     pub fn diagonal(xx: T) -> Vec3<T> {
         Vec3::new(xx, xx, xx)
     }
-}
 
-impl <'a, T > Mul<Vec3<T>> for &'a Vec3<T> where T: Mul<T, Output = T> + Zero + Copy + Clone {
-    type Output = T;
-
-    fn mul(self, rhs: Vec3<T>) -> T {
-        return self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    pub fn dot(self, rhs: Vec3<T>) -> T {
+         return self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 }
 
@@ -77,7 +73,7 @@ mod tests {
         let u: Vec3<f64> = Vec3::diagonal(1.0);
         let v: Vec3<f64> = Vec3::new(0.0, 1.0, 2.0);
 
-        let dot_product: f64 = &u * v;
+        let dot_product: f64 = u.dot(v);
 
         assert_eq!(dot_product, 3.0);
     }
