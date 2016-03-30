@@ -32,8 +32,8 @@ impl <T> Mul<Vec3<T>> for Vec3<T> where T: Mul<T, Output = T> + Add<T, Output = 
 }
 
 impl <T> Vec3<T> where T: Mul<T, Output=T> + Add<T, Output=T> + Zero + Float + Clone + Copy {
-    pub fn norm(self) -> T {
-        (self.x * self.x + self.y * self.y + self.z * self.z)
+    pub fn length(self) -> T {
+        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 }
 
@@ -73,9 +73,9 @@ mod tests {
     }
 
     #[test]
-    fn should_know_its_norm() {
+    fn should_know_its_length() {
         let v: Vec3<f64> = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
 
-        assert_eq!(v.norm(), 0.0);
+        assert_eq!(v.length(), 0.0);
     }
 }
