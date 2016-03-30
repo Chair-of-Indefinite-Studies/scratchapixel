@@ -1,6 +1,5 @@
 use std::ops::{Mul,Add};
 
-#[derive(Copy,Clone)]
 pub struct Vec3<T: Mul<T, Output = T> + Add<T, Output = T> + Copy + Clone> {
     x: T,
     y: T,
