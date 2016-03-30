@@ -1,6 +1,5 @@
 use std::ops::{Mul,Add};
-use num::traits::{Zero,Float};
-
+use num::traits::{Zero,One,Float};
 
 #[derive(PartialEq,Debug)]
 pub struct Vec3<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy + Clone {
@@ -23,7 +22,7 @@ impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy
     }
 }
 
-impl <T> Mul<Vec3<T>> for Vec3<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy + Clone {
+impl <'a, T > Mul<Vec3<T>> for &'a Vec3<T> where T: Mul<T, Output = T> + Zero + Copy + Clone {
     type Output = T;
 
     fn mul(self, rhs: Vec3<T>) -> T {
@@ -31,9 +30,20 @@ impl <T> Mul<Vec3<T>> for Vec3<T> where T: Mul<T, Output = T> + Add<T, Output = 
     }
 }
 
-impl <T> Vec3<T> where T: Mul<T, Output=T> + Add<T, Output=T> + Zero + Float + Clone + Copy {
-    pub fn length(self) -> T {
+impl <T> Vec3<T> where T: Mul<T, Output=T> + One + Zero + Float + Clone + Copy {
+    pub fn length(& self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+    }
+
+    pub fn normalize(&mut self) {
+        let length: T = self.length();
+        if length > T::zero() {
+            let inverse_length = T::one() / length;
+
+            self.x = self.x * inverse_length;
+            self.y = self.y * inverse_length;
+            self.z = self.z * inverse_length;
+        }
     }
 }
 
@@ -67,7 +77,7 @@ mod tests {
         let u: Vec3<f64> = Vec3::diagonal(1.0);
         let v: Vec3<f64> = Vec3::new(0.0, 1.0, 2.0);
 
-        let dot_product: f64 = u * v;
+        let dot_product: f64 = &u * v;
 
         assert_eq!(dot_product, 3.0);
     }
@@ -77,5 +87,13 @@ mod tests {
         let v: Vec3<f64> = Vec3 { x: 0.0, y: 0.0, z: 0.0 };
 
         assert_eq!(v.length(), 0.0);
+    }
+
+    #[test]
+    fn should_be_able_to_normalize() {
+        let mut v: Vec3<f64> = Vec3::new(3.0, 0.0, 0.0);
+        v.normalize();
+
+        assert_eq!(v, Vec3 { x: 1.0, y: 0.0, z: 0.0 });
     }
 }
