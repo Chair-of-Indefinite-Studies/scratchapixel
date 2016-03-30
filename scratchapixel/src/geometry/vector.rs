@@ -1,14 +1,14 @@
-use std::ops::{Mul,Add};
+use std::ops::{Mul,Add,Sub};
 use num::traits::{Zero,One,Float};
 
 #[derive(PartialEq,Debug)]
-pub struct Vec3<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy + Clone {
+pub struct Vec3<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Zero + Copy + Clone {
     x: T,
     y: T,
     z: T,
 }
 
-impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy + Clone {
+impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Zero + Copy + Clone {
     pub fn new(xx: T, yy: T, zz: T) -> Vec3<T> {
         Vec3 { x: xx, y: yy, z: zz }
     }
@@ -22,7 +22,15 @@ impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy
     }
 
     pub fn dot(self, rhs: Vec3<T>) -> T {
-         return self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
+
+    pub fn cross(self, rhs: Vec3<T>) -> Vec3<T> {
+        Vec3::new(
+            self.y * rhs.z - self.z * rhs.y,
+            self.z * rhs.x - self.x * rhs.z,
+            self.x * rhs.y - self.y * rhs.x,
+            )
     }
 }
 
@@ -91,5 +99,15 @@ mod tests {
         v.normalize();
 
         assert_eq!(v, Vec3 { x: 1.0, y: 0.0, z: 0.0 });
+    }
+
+    #[test]
+    fn should_know_cross_product() {
+        let v: Vec3<f64> = Vec3::new(1.0, 0.0, 0.0);
+        let w: Vec3<f64> = Vec3::new(0.0, 1.0, 0.0);
+
+        let product = v.cross(w);
+
+        assert_eq!(product, Vec3 { x: 0.0, y: 0.0, z: 1.0 });
     }
 }
