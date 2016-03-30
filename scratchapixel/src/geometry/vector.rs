@@ -9,7 +9,7 @@ pub struct Vec3<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Zero + Cop
 }
 
 impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Zero + Copy + Clone {
-    pub fn new() -> Vec3<T> {
+    pub fn zero() -> Vec3<T> {
         Vec3 { x: T::zero(), y: T::zero(), z: T::zero() }
     }
 
@@ -28,7 +28,7 @@ mod tests {
 
     #[test]
     fn should_initialize_to_zero_vector() {
-        let v: Vec3<f64> = Vec3::new();
+        let v: Vec3<f64> = Vec3::zero();
 
         assert_eq!(v, Vec3::<f64>{ x: 0.0, y: 0.0, z: 0.0 });
     }
