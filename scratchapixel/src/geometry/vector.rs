@@ -58,6 +58,19 @@ impl <T> Sub<Vec3<T>> for Vec3<T> where T : Mul<T, Output = T> + Add<T, Output =
     }
 }
 
+impl <T> Mul<T> for Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Zero + Copy + Clone {
+    type Output = Vec3<T>;
+
+    fn mul(self, rhs: T) -> Vec3<T> {
+        Vec3::new(
+            self.x * rhs,
+            self.y * rhs,
+            self.z * rhs,
+            )
+    }
+}
+
+
 
 impl <T> Vec3<T> where T: Mul<T, Output=T> + One + Zero + Float + Clone + Copy {
     pub fn length(& self) -> T {
@@ -154,5 +167,15 @@ mod tests {
         let sum = v - w;
 
         assert_eq!(sum, Vec3 { x: 1.0, y: -1.0, z: 0.0 });
+    }
+
+    #[test]
+    fn should_form_scalar_multiplication() {
+        let v: Vec3<f64> = Vec3::new(1.0, 0.0, 0.0);
+        let c: f64 = 2.0;
+
+        let scalar = v * c;
+
+        assert_eq!(scalar, Vec3 { x: 2.0, y: 0.0, z: 0.0 });
     }
 }
