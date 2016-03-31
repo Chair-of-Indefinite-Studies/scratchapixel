@@ -41,6 +41,13 @@ impl <T> Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, O
             dst.z = dst.z / w;
         }
     }
+
+    #[allow(non_snake_case)]
+    pub fn multDirMatrix(self, src: &Vec3<T>, dst: &mut Vec3<T>) {
+        dst.x = src.x * self.m[0][0] +  src.y * self.m[1][0] +  src.z * self.m[2][0];
+        dst.y = src.x * self.m[0][1] +  src.y * self.m[1][1] +  src.z * self.m[2][1];
+        dst.z = src.x * self.m[0][2] +  src.y * self.m[1][2] +  src.z * self.m[2][2];
+    }
 }
 
 impl <T> Index<usize> for Matrix44<T> {
@@ -144,5 +151,21 @@ mod tests {
         m.multVecMatrix(&v, &mut result);
 
         assert_eq!(result, Vec3::new(1.5, 2.5, 3.5));
+    }
+
+    #[test]
+    fn should_transform_a_vector() {
+        let m: Matrix44<f64> = Matrix44::new([
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.5, 0.5, 0.5, 1.0],
+            ]);
+        let v: Vec3<f64> = Vec3::new(1.0, 2.0, 3.0);
+        let mut result: Vec3<f64> = Vec3::zero();
+
+        m.multDirMatrix(&v, &mut result);
+
+        assert_eq!(result, Vec3::new(1.0, 2.0, 3.0));
     }
 }
