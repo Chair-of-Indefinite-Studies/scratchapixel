@@ -1,12 +1,14 @@
 use num::traits::{Zero,One};
-use std::ops::{Mul,Add,Sub,Index};
+use std::ops::{Mul,Add,Sub,Div,Index};
+
+use geometry::vector::Vec3;
 
 #[derive(PartialEq,Debug)]
 pub struct Matrix44<T> {
     pub m: [[T; 4]; 4],
 }
 
-impl <T> Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Zero + One + Copy + Clone {
+impl <T> Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Sub<T, Output = T> + Zero + One + PartialEq + Copy + Clone {
     pub fn zero() -> Matrix44<T> {
         Matrix44 { m: [
             [T::zero(), T::zero(), T::zero(), T::zero()],
@@ -26,9 +28,22 @@ impl <T> Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, O
     pub fn new(mm: [[T; 4]; 4]) -> Matrix44<T> {
         Matrix44 { m : mm }
     }
+
+    #[allow(non_snake_case)]
+    pub fn multVecMatrix(self, src: &Vec3<T>, dst: &mut Vec3<T>) {
+        dst.x = src.x * self.m[0][0] +  src.y * self.m[1][0] +  src.z * self.m[2][0] +  self.m[3][0];
+        dst.y = src.x * self.m[0][1] +  src.y * self.m[1][1] +  src.z * self.m[2][1] +  self.m[3][1];
+        dst.z = src.x * self.m[0][2] +  src.y * self.m[1][2] +  src.z * self.m[2][2] +  self.m[3][2];
+        let w = src.x * self.m[0][3] +  src.y * self.m[1][3] +  src.z * self.m[2][3] +  self.m[3][3];
+        if w != T::one() && w != T::zero() {
+            dst.x = dst.x / w;
+            dst.y = dst.y / w;
+            dst.z = dst.z / w;
+        }
+    }
 }
 
-impl <T> Index<usize> for Matrix44<T> where T: Zero {
+impl <T> Index<usize> for Matrix44<T> {
     type Output = [T; 4];
 
     fn index(&self, index: usize) -> &[T; 4] {
@@ -36,7 +51,7 @@ impl <T> Index<usize> for Matrix44<T> where T: Zero {
     }
 }
 
-impl <T> Mul<Matrix44<T>> for Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Zero + One + Copy + Clone {
+impl <T> Mul<Matrix44<T>> for Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Sub<T, Output = T> + Zero + One + PartialEq + Copy + Clone {
     type Output = Matrix44<T>;
 
     fn mul(self, rhs: Matrix44<T>) -> Matrix44<T> {
@@ -56,6 +71,7 @@ impl <T> Mul<Matrix44<T>> for Matrix44<T> where T: Mul<T, Output = T> + Add<T, O
 #[cfg(test)]
 mod tests {
     use super::*;
+    use geometry::vector::Vec3;
 
     #[test]
     fn should_be_initialized_as_zero_matrix() {
@@ -112,5 +128,21 @@ mod tests {
             [0.0, 0.0, 6.0, 0.0],
             [0.0, 0.0, 0.0, 4.0],
         ]})
+    }
+
+    #[test]
+    fn should_transform_a_point() {
+        let m: Matrix44<f64> = Matrix44::new([
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.5, 0.5, 0.5, 1.0],
+            ]);
+        let v: Vec3<f64> = Vec3::new(1.0, 2.0, 3.0);
+        let mut result: Vec3<f64> = Vec3::zero();
+
+        m.multVecMatrix(&v, &mut result);
+
+        assert_eq!(result, Vec3::new(1.5, 2.5, 3.5));
     }
 }
