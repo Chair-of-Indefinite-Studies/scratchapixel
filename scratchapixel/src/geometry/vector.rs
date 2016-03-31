@@ -73,6 +73,11 @@ impl <T> Mul<T> for Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + 
 
 
 impl <T> Vec3<T> where T: Mul<T, Output=T> + One + Zero + Float + Clone + Copy {
+    #[allow(non_snake_case)]
+    pub fn sphericalToCartesian(theta: T, phi: T) -> Vec3<T> {
+        Vec3::new(phi.cos() * theta.sin(), phi.sin() * theta.sin(), theta.cos())
+    }
+
     pub fn length(& self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
@@ -177,5 +182,12 @@ mod tests {
         let scalar = v * c;
 
         assert_eq!(scalar, Vec3 { x: 2.0, y: 0.0, z: 0.0 });
+    }
+
+    #[test]
+    fn should_know_how_to_convert_from_polar_coordinates() {
+        let v: Vec3<f64> = Vec3::sphericalToCartesian(0.0, 0.0);
+
+        assert_eq!(v, Vec3 { x: 0.0, y: 0.0, z: 1.0 });
     }
 }
