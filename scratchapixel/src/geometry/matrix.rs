@@ -48,6 +48,16 @@ impl <T> Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, O
         dst.y = src.x * self.m[0][1] +  src.y * self.m[1][1] +  src.z * self.m[2][1];
         dst.z = src.x * self.m[0][2] +  src.y * self.m[1][2] +  src.z * self.m[2][2];
     }
+
+    pub fn transpose(self) -> Matrix44<T> {
+        let mut result: [[T; 4]; 4] = [[T::zero(); 4]; 4];
+        for i in 0..4 {
+            for j in 0..4 {
+                result[i][j] = self[j][i];
+            }
+        }
+        Matrix44::new(result)
+    }
 }
 
 impl <T> Index<usize> for Matrix44<T> {
@@ -167,5 +177,22 @@ mod tests {
         m.multDirMatrix(&v, &mut result);
 
         assert_eq!(result, Vec3::new(1.0, 2.0, 3.0));
+    }
+
+    #[test]
+    fn should_know_its_transpose() {
+         let m: Matrix44<f64> = Matrix44::new([
+            [ 1.0,  2.0,  3.0,  4.0],
+            [ 5.0,  6.0,  7.0,  8.0],
+            [ 9.0, 10.0, 11.0, 12.0],
+            [13.0, 14.0, 15.0, 16.0], ]);
+
+        let m_t = m.transpose();
+
+        assert_eq!(m_t, Matrix44::new([
+            [ 1.0,  5.0,  9.0, 13.0],
+            [ 2.0,  6.0, 10.0, 14.0],
+            [ 3.0,  7.0, 11.0, 15.0],
+            [ 4.0,  8.0, 12.0, 16.0], ]));
     }
 }
