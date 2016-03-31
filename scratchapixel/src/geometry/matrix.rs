@@ -58,6 +58,8 @@ impl <T> Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, O
         }
         Matrix44::new(result)
     }
+
+    // TODO Determinant & Inverse
 }
 
 impl <T> Index<usize> for Matrix44<T> {
