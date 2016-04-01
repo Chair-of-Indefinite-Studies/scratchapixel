@@ -70,12 +70,70 @@ impl <T> Mul<T> for Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + 
     }
 }
 
-
-
 impl <T> Vec3<T> where T: Mul<T, Output=T> + One + Zero + Float + Clone + Copy {
     #[allow(non_snake_case)]
     pub fn sphericalToCartesian(theta: T, phi: T) -> Vec3<T> {
         Vec3::new(phi.cos() * theta.sin(), phi.sin() * theta.sin(), theta.cos())
+    }
+
+    fn clamp(value: T, low: T, high: T) -> T {
+        if value < low {
+            return low
+        }
+        if value > high {
+            return high
+        }
+        value
+    }
+
+    #[allow(non_snake_case)]
+    pub fn sphericalTheta(v: &Vec3<T>) -> T {
+       Vec3::clamp(v.z, -T::one(), T::one()).acos()
+    }
+
+    #[allow(non_snake_case)]
+    pub fn sphericalPhi(v: &Vec3<T>) -> T {
+        v.y.atan2(v.x) // TODO should be in range [0..2PI)
+    }
+
+    #[allow(non_snake_case)]
+    pub fn cosTheta(v: &Vec3<T>) -> T {
+        v.z
+    }
+
+    #[allow(non_snake_case)]
+    pub fn sinTheta2(v: &Vec3<T>) -> T {
+        let positive_result = T::one() - Vec3::cosTheta(&v) * Vec3::cosTheta(&v);
+        if positive_result >= T::zero() {
+            positive_result
+        } else {
+            T::zero()
+        }
+    }
+
+    #[allow(non_snake_case)]
+    pub fn sinTheta(v: &Vec3<T>) -> T {
+        Vec3::sinTheta2(v).sqrt()
+    }
+
+    #[allow(non_snake_case)]
+    pub fn cosPhi(v: &Vec3<T>) -> T {
+        let sinTheta: T = Vec3::sinTheta(v);
+        if sinTheta == T::zero() {
+            T::one()
+        } else {
+            Vec3::clamp(v.x / sinTheta, -T::one(), T::one())
+        }
+    }
+
+    #[allow(non_snake_case)]
+    pub fn sinPhi(v: &Vec3<T>) -> T {
+        let sinTheta: T = Vec3::sinTheta(v);
+        if sinTheta == T::zero() {
+            T::zero()
+        } else {
+            Vec3::clamp(v.y / sinTheta, -T::one(), T::one())
+        }
     }
 
     pub fn length(& self) -> T {
