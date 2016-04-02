@@ -8,7 +8,7 @@ pub struct Matrix44<T> {
     pub m: [[T; 4]; 4],
 }
 
-impl <T> Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Sub<T, Output = T> + Zero + One + PartialEq + Copy + Clone {
+impl <T> Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Sub<T, Output = T> + Zero + One + PartialEq + PartialOrd + Copy + Clone {
     pub fn zero() -> Matrix44<T> {
         Matrix44 { m: [
             [T::zero(), T::zero(), T::zero(), T::zero()],
@@ -59,7 +59,91 @@ impl <T> Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, O
         Matrix44::new(result)
     }
 
-    // TODO Determinant & Inverse
+
+    pub fn inverse(self) -> Matrix44<T> {
+        let mut original = [[ T::zero(); 4]];
+        for i in 0..4 {
+            for j in 0..4 {
+                original[i][j] = self[i][j];
+            }
+        }
+
+        let mut result = [
+            [ T::one(), T::zero(), T::zero(), T::zero() ],
+            [ T::zero(), T::one(), T::zero(), T::zero() ],
+            [ T::zero(), T::zero(), T::one(), T::zero() ],
+            [ T::zero(), T::zero(), T::zero(), T::one() ],];
+        for i in 0..4 {
+            let mut pivot = i;
+            let mut pivot_size = original[i][i];
+            if pivot_size < T::zero() {
+                pivot_size = T::zero() - pivot_size;
+
+                for j in 0..4 {
+                    let mut tmp = original[j][i];
+
+                    if tmp < T::zero() {
+                        tmp = T::zero() - tmp;
+
+                        if tmp > pivot_size {
+                            pivot = j;
+                            pivot_size = tmp;
+                        }
+                    }
+                }
+            }
+
+            if pivot_size == T::zero() {
+                // Can not invert singular matrix
+                return Matrix44::zero();
+            }
+
+            if pivot != i {
+                for j in 0..4 {
+                    let mut tmp = original[i][j];
+                    original[i][j] = original[pivot][j];
+                    original[pivot][j] = tmp;
+
+                    tmp = result[i][j];
+                    result[i][j] = result[pivot][j];
+                    result[pivot][j] = tmp;
+                }
+            }
+
+            for j in 0..4 {
+                let f = original[j][i] / original[i][i];
+
+                for k in 0..4 {
+                    original[j][k] = original[j][k] - f * original[i][k];
+                    result[j][k] = result[j][k] - f * result[i][k];
+                }
+            }
+        }
+
+        for t in 0..4 {
+            let i = 4 - t - 1;
+            let f = self[i][i];
+            if f == T::zero() {
+                // Can not invert singular matrix
+                return Matrix44::zero();
+            }
+
+            for j in 0..4 {
+                original[i][j] = original[i][j] / f;
+                result[i][j] = result[i][j] / f;
+            }
+
+            for j in 0..4 {
+                let f = original[j][i];
+
+                for k in 0..4 {
+                    original[j][k] = original[j][k] - f * original[i][k];
+                    result[j][k] = result[j][k] - f * result[i][k]
+                }
+            }
+        }
+        Matrix44::new(result)
+    }
 }
 
 impl <T> Index<usize> for Matrix44<T> {
@@ -70,7 +154,7 @@ impl <T> Index<usize> for Matrix44<T> {
     }
 }
 
-impl <T> Mul<Matrix44<T>> for Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Sub<T, Output = T> + Zero + One + PartialEq + Copy + Clone {
+impl <T> Mul<Matrix44<T>> for Matrix44<T> where T: Mul<T, Output = T> + Add<T, Output = T> + Div<T, Output = T> + Sub<T, Output = T> + Zero + One + PartialEq + PartialOrd + Copy + Clone {
     type Output = Matrix44<T>;
 
     fn mul(self, rhs: Matrix44<T>) -> Matrix44<T> {
