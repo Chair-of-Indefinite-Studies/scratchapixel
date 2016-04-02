@@ -21,17 +21,24 @@ impl <T> Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Outp
         Vec3::new(xx, xx, xx)
     }
 
-    pub fn dot(self, rhs: Vec3<T>) -> T {
+    #[allow(non_snake_case)]
+    pub fn dotProduct(self, rhs: Vec3<T>) -> T {
          self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    pub fn cross(self, rhs: Vec3<T>) -> Vec3<T> {
+    #[allow(non_snake_case)]
+    pub fn crossProduct(self, rhs: Vec3<T>) -> Vec3<T> {
         Vec3::new(
             self.y * rhs.z - self.z * rhs.y,
             self.z * rhs.x - self.x * rhs.z,
             self.x * rhs.y - self.y * rhs.x,
             )
     }
+
+    pub fn norm(&self) -> T {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
+
 }
 
 impl <T> Add<Vec3<T>> for Vec3<T> where T : Mul<T, Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Zero + Copy + Clone {
@@ -137,7 +144,7 @@ impl <T> Vec3<T> where T: Mul<T, Output=T> + One + Zero + Float + Clone + Copy {
     }
 
     pub fn length(& self) -> T {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+        self.norm().sqrt()
     }
 
     pub fn normalize(&mut self) {
@@ -182,7 +189,7 @@ mod tests {
         let u: Vec3<f64> = Vec3::diagonal(1.0);
         let v: Vec3<f64> = Vec3::new(0.0, 1.0, 2.0);
 
-        let dot_product: f64 = u.dot(v);
+        let dot_product: f64 = u.dotProduct(v);
 
         assert_eq!(dot_product, 3.0);
     }
@@ -207,7 +214,7 @@ mod tests {
         let v: Vec3<f64> = Vec3::new(1.0, 0.0, 0.0);
         let w: Vec3<f64> = Vec3::new(0.0, 1.0, 0.0);
 
-        let product = v.cross(w);
+        let product = v.crossProduct(w);
 
         assert_eq!(product, Vec3 { x: 0.0, y: 0.0, z: 1.0 });
     }
